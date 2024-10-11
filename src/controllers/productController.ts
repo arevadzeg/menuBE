@@ -50,8 +50,6 @@ export const getStoreProducts = async (
     orderBy.title = order; // Sort by name (title) asc/desc
   }
 
-  console.log("ddddddddddddddddddd", orderBy, sort, search);
-
   try {
     // Fetch products from the database with optional search and sorting
     const products = await prisma.product.findMany({
