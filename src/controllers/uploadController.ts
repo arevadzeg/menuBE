@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 
 initializeApp(firebaseConfig);
-const storage = getStorage();
+export const storage = getStorage();
 
 export const uploadFile = async (req: Request, res: Response): Promise<void> => {
 
@@ -22,7 +22,7 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
     if (!req.file) {
        res.status(400).send({ message: "No file provided" });
     }else{
-        const storageRef = ref(storage, `files/${req.file.originalname}`);
+        const storageRef = ref(storage, `images/${req.file.originalname}`);
         const metadata = {
           contentType: req.file.mimetype,
         };

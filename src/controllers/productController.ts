@@ -1,5 +1,15 @@
 import { Request, Response } from "express";
 import type { PrismaClient } from "@prisma/client";
+import {  ref, deleteObject } from "firebase/storage";
+import { storage } from "./uploadController";
+
+
+const getImageNameFromUrl = (url: string): string => {
+  const parts = url.split('/');
+  const lastPart = parts[parts.length - 1]; 
+  const name = lastPart.split('?')[0]; 
+  return decodeURIComponent(name);
+};
 
 export const createProduct = async (
   req: Request,
@@ -24,6 +34,41 @@ export const createProduct = async (
     res.status(500).json({ error: "Failed to create product" });
   }
 };
+
+
+export const deleteProduct = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient
+) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const imageRef = ref(storage, `${getImageNameFromUrl(product.image)}`); // Assuming product.image contains the file name
+
+    if(product.image){
+
+      await deleteObject(imageRef);
+    }
+    await prisma.product.delete({
+      where: { id: productId },
+    });
+
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product: ", error);
+    res.status(500).json({ error: "Failed to delete product" });
+  }
+};
+
 
 export const getStoreProducts = async (
   req: Request,
@@ -109,22 +154,5 @@ export const updateProduct = async (
     res.status(200).json(updatedProduct);
   } catch (error) {
     res.status(500).json({ error: "Failed to update product" });
-  }
-};
-
-export const deleteProduct = async (
-  req: Request,
-  res: Response,
-  prisma: PrismaClient
-) => {
-  const { productId } = req.params;
-
-  try {
-    await prisma.product.delete({
-      where: { id: productId },
-    });
-    res.status(200).json({ message: "Product deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete product" });
   }
 };
