@@ -18,11 +18,20 @@ export const createProduct = async (
   prisma: PrismaClient
 ) => {
   const { storeId } = req.params;
-  const { title, price, image, isOnSale } = req.body;
+  const { title, price, image, isOnSale, section, sortOrder, description } = req.body;
 
   try {
     const newProduct = await prisma.product.create({
-      data: { title, price, image, isOnSale, storeId },
+      data: { 
+        title, 
+        price, 
+        image, 
+        isOnSale, 
+        storeId, 
+        section: section || null,  // Use null if not provided
+        sortOrder: sortOrder || 0,  // Default to 0 if not provided
+        description: description || "" // Default to empty string if not provided
+      },
     });
     res.status(201).json(newProduct);
   } catch (error) {
@@ -103,7 +112,7 @@ export const updateProduct = async (
   prisma: PrismaClient
 ) => {
   const { productId } = req.params;
-  const { title, price, isOnSale, image } = req.body;
+  const { title, price, isOnSale, image, section, sortOrder, description } = req.body;
 
   try {
     const existingProduct = await prisma.product.findUnique({ where: { id: productId } });
@@ -122,7 +131,15 @@ export const updateProduct = async (
 
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
-      data: { title, price, isOnSale, image },
+      data: { 
+        title, 
+        price, 
+        isOnSale, 
+        image, 
+        section, 
+        sortOrder, 
+        description 
+      },
     });
 
     res.status(200).json(updatedProduct);

@@ -31,13 +31,16 @@ model Store {
 }
 
 model Product {
-  id        String    @id @default(uuid()) @db.Uuid
-  storeId   String    @db.Uuid // Ensure this matches the Store's id type
-  store     Store     @relation(fields: [storeId], references: [id])
-  title     String
-  price     Float
-  isOnSale  Boolean   @default(false)
-  image     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String   @id @default(uuid()) @db.Uuid
+  storeId     String   @db.Uuid // Ensure this matches the Store's id type
+  store       Store    @relation(fields: [storeId], references: [id])
+  title       String
+  price       Float
+  isOnSale    Boolean  @default(false)
+  image       String
+  section     String?  @default("")  // Optional string field, defaults to null
+  sortOrder   Float    @default(0)      // Float field, defaults to 0
+  description String   @default("")      // String field, defaults to an empty string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
